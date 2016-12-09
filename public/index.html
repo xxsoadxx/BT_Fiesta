@@ -1,0 +1,176 @@
+<html>
+	<head>
+		<meta name="mobile-web-app-capable" content="yes">
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+		<script src="./exif.js"></script>
+		<script src="https://blueimp.github.io/JavaScript-Load-Image/js/load-image.js"></script>
+		<script src="https://blueimp.github.io/JavaScript-Load-Image/js/load-image-orientation.js"></script>
+		<script src="https://blueimp.github.io/JavaScript-Load-Image/js/load-image-meta.js"></script>
+		<script src="https://blueimp.github.io/JavaScript-Load-Image/js/load-image-exif.js"></script>
+		<script src="https://blueimp.github.io/JavaScript-Load-Image/js/load-image-exif-map.js"></script>
+		<style>
+			.splash {
+			  position: absolute;
+			  z-index: 9999999999999;
+			  background: white;
+			  color: gray;
+			  top: 0;
+			  bottom: 0;
+			  left: 0;
+			  right: 0;
+			  
+			  background: #000;
+			  opacity: .8;
+			}
+
+			.splash-title {
+			  text-align: center;
+			  max-width: 500px;
+			  margin: 10% auto;
+			  padding: 10px;
+			}
+
+			.splash-title h1 {
+			  font-size: 100px;
+			}
+			
+			.splash2 {
+			  position: absolute;
+			  z-index: 9999999999999;
+			  background: white;
+			  color: gray;
+			  top: 0;
+			  bottom: 0;
+			  left: 0;
+			  right: 0;
+			  
+			  background: #000;
+			  opacity: .8;
+			}
+
+			.splash-title2 {
+			  text-align: center;
+			  max-width: 500px;
+			  margin: 10% auto;
+			  padding: 10px;
+			}
+
+			.splash-title2 h1 {
+			  font-size: 100px;
+			}
+		</style>
+	</head>
+	<div style="display: none;" class="splash"> 
+		<div class="color-line"></div>
+		<div class="splash-title">
+			<h1>Cargando</h1>
+			<p style="font-size:50">Espere un momento. </p>
+			<img src="./loading-bars.svg" height="300" width="300"> 
+		</div> 
+	</div>
+	<div style="display: none;" class="splash2" onclick="hide()"> 
+		<div class="color-line"></div>
+		<div class="splash-title2">
+			<h1>Subido con éxito!</h1>
+			<i style="font-size: 200px;color:#11b140" class="fa fa-check" aria-hidden="true"></i>
+		</div> 
+	</div>
+	<body style="background-image:url(back.jpg);background-repeat:no-repeat;background-size: cover;">
+		
+		<div style="text-align: center;height:100%;">
+			<button style="width: 400px;height: 400px;border-radius: 200px;margin-top: 50%;position:relative;" id="boton" type="button" class="btn btn-success"><i style="font-size: 200px;" class="fa fa-camera" aria-hidden="true"></i><br>
+			<input type="file" style="width: 100%;height: 100%;top: 0px;position: absolute;opacity: 0;" accept="image/*" id="capture" onchange="previewFile()" > 
+			</button>
+			<img src="./logo.png">
+		</div>
+		<!--
+		<img src="" height="200" style="image-orientation: from-image" alt="Image preview...">
+		<button id="enviar" type="button" onclick="send()"> Enviar </button>
+		-->
+		
+	</body>
+	<script>
+	
+		function hide(){
+			$('.splash2').hide();
+		 
+		}
+		var base64 = ""
+		var orientation2;
+		function previewFile() {
+			
+			var file = document.querySelector('input[type=file]').files[0];  // file
+			EXIF.getData(file, function() {
+				var orientation = EXIF.getTag(this, "Orientation");
+				orientation2 = orientation;
+			});
+			
+			send();
+			
+			/*
+				  loadImage(
+						document.querySelector('input[type=file]').files[0],
+						function (img) {
+							document.body.appendChild(img);
+						},
+						{maxWidth: 600, meta: true, canvas: true, orientation: true} // Options
+					);
+		    */
+		}
+		
+
+			
+	
+		
+		
+		function send() {
+			$('.splash').show();
+			 /*$.ajax({
+                    data:  {"base":base64},
+                    url:   window.location.protocol+'//'+window.location.host+'/api/send',
+                    type:  'post',
+					dataType: "json",
+                    beforeSend: function () {
+                            $("#enviar").html("Procesando, espere por favor...");
+                    },
+                    success:  function (response) {
+					  console.log(response);
+
+					  if(response.status){
+						$("#enviar").html("Enviado!");
+					  }
+					}
+			})*/
+				
+			
+            var xhr = new XMLHttpRequest();
+            xhr.addEventListener('progress', function(e) {
+                var done = e.position || e.loaded, total = e.totalSize || e.total;
+                console.log('xhr progress: ' + (Math.floor(done/total*1000)/10) + '%');
+            }, false);
+            if ( xhr.upload ) {
+                xhr.upload.onprogress = function(e) {
+                    var done = e.position || e.loaded, total = e.totalSize || e.total;
+                    console.log('xhr.upload progress: ' + done + ' / ' + total + ' = ' + (Math.floor(done/total*1000)/10) + '%');
+                };
+            }
+            xhr.onreadystatechange = function(e) {
+                if ( 4 == this.readyState ) {
+                    console.log(['xhr upload complete', e]);
+					$('.splash').hide();
+					$('.splash2').show();
+					setTimeout(function(){ $('.splash2').hide(); }, 4000);
+					
+                }
+            };
+            xhr.open('post', window.location.protocol+'//'+window.location.host+'/upload/url', true);
+			var file    = document.querySelector('input[type=file]').files[0];
+			var formData = new FormData();
+			formData.append("file", file);
+			xhr.setRequestHeader("orientation", orientation2);
+            xhr.send(formData);
+		}
+	</script>
+</html>

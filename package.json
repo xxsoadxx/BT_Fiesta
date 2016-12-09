@@ -1,0 +1,17 @@
+{
+  "name": "BT_Fiesta",
+  "version": "0.1.0",
+  "description": "Servidor node para Fiesta",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "compression": "^1.6.2",
+    "connect-multiparty": "^2.0.0",
+    "cors": "^2.8.1",
+    "express": "^4.14.0",
+    "fs": "0.0.2",
+    "path": "^0.12.7"
+  }
+}
